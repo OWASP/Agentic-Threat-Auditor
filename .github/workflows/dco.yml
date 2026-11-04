@@ -1,0 +1,45 @@
+name: "DCO Check"
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+jobs:
+  dco:
+    name: "Developer Certificate of Origin"
+    runs-on: ubuntu-latest
+    steps:
+      - name: "Check DCO"
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: "Verify Signed-off-by trailer"
+        run: |
+          echo "Verifying DCO sign-off trailers on incoming commits..."
+          # If on pull request, check from base ref; otherwise check last commit
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            BASE_COMMIT="origin/${{ github.base_ref }}"
+            COMMITS=$(git log --no-merges --format="%H" ${BASE_COMMIT}..HEAD)
+          else
+            COMMITS=$(git log -1 --format="%H")
+          fi
+
+          MISSING_DCO=0
+          for commit in $COMMITS; do
+            if ! git log -1 --format="%B" $commit | grep -q -E "^Signed-off-by: .+ <.+@.+>$"; then
+              echo "Error: Commit $commit is missing valid 'Signed-off-by: Real Name <email>' trailer."
+              MISSING_DCO=1
+            fi
+          done
+
+          if [ "$MISSING_DCO" -ne 0 ]; then
+            echo ""
+            echo "All commits contributed to OWASP Agentic Threat Auditor must include a DCO sign-off line (-s)."
+            echo "Run: git commit --amend -s"
+            exit 1
+          fi
+          echo "DCO validation passed successfully."
+
