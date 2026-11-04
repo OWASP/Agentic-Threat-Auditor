@@ -7,6 +7,8 @@ and local mock testbeds. Non-loopback target addresses require explicit --allow-
 from __future__ import annotations
 
 import ipaddress
+from pathlib import Path
+import re
 import socket
 from urllib.parse import urlparse
 
@@ -31,9 +33,21 @@ def is_local_endpoint(endpoint: str | None) -> bool:
         # None or empty endpoint designates in-memory mock or local file trace
         return True
 
-    # If it's a local file path or mock marker
-    if endpoint.startswith("mock://") or endpoint.startswith("file://") or endpoint.startswith("/"):
+    # Match local schemes and relative path prefixes
+    local_prefixes = ("mock://", "file://", "/", ".\\", "./")
+    if endpoint.startswith(local_prefixes):
         return True
+
+    # Match Windows drive letter paths (e.g. C:\path or D:/path)
+    if bool(re.match(r"^[a-zA-Z]:[\\/]", endpoint)):
+        return True
+
+    # Check whether endpoint points to an existing file or directory on disk
+    try:
+        if Path(endpoint).exists():
+            return True
+    except (OSError, ValueError):
+        pass
 
     parsed = urlparse(endpoint if "://" in endpoint else f"http://{endpoint}")
     host = parsed.hostname

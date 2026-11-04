@@ -1,0 +1,55 @@
+name: Bug Report
+description: Report a bug, malfunction, or unexpected behavior in OATA.
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for reporting an issue in OWASP Agentic Threat Auditor (OATA).
+  - type: input
+    id: version
+    attributes:
+      label: OATA Version
+      description: What version of OATA are you running? (Run `oata version` to check)
+      placeholder: "0.1.0a1"
+    validations:
+      required: true
+  - type: input
+    id: python-version
+    attributes:
+      label: Python & OS Environment
+      description: Python version and operating system
+      placeholder: "Python 3.12 on Linux Ubuntu 24.04 / Windows 11"
+    validations:
+      required: true
+  - type: textarea
+    id: description
+    attributes:
+      label: Description of the Bug
+      description: A clear and concise description of the issue encountered.
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Reproduction Steps
+      description: Exact CLI command or script to reproduce the problem.
+      placeholder: |
+        1. Run `oata audit --target ...`
+        2. Observe error output...
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected Behavior
+      description: What did you expect to happen instead?
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Terminal Logs / Traceback
+      description: Paste any error messages or tracebacks here.
+      render: shell
+

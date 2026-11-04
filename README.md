@@ -3,6 +3,7 @@
 [![OWASP Incubator](https://img.shields.io/badge/owasp-incubator-blue.svg)](https://owasp.org/projects/agentic-threat-auditor)
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache%202.0-green.svg)](LICENSE)
 [![Classification: Breaker](https://img.shields.io/badge/classification-breaker-red.svg)](https://owasp.org/projects/agentic-threat-auditor)
+[![CI](https://github.com/OWASP/Agentic-Threat-Auditor/actions/workflows/ci.yml/badge.svg)](https://github.com/OWASP/Agentic-Threat-Auditor/actions/workflows/ci.yml)
 [![Python Version](https://img.shields.io/badge/python-3.10%20%7C%203.11%20%7C%203.12-blue)](pyproject.toml)
 [![OWASP Slack](https://img.shields.io/badge/slack-%23project--agentic--threat--auditor-brightgreen.svg)](https://owasp.slack.com)
 
@@ -154,7 +155,7 @@ Audit a local endpoint (protected by the Safe Local Target Guard):
 oata audit --target 127.0.0.1:8000 --format console
 
 # Audit an offline interaction trace JSON file
-oata audit --target ./sample_trace.json --adapter trace --format sarif --output trace_audit.sarif
+oata audit --target ./examples/sample_trace.json --adapter trace --format sarif --output trace_audit.sarif
 ```
 
 ---

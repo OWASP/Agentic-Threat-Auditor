@@ -1,0 +1,57 @@
+name: Attack Vector Proposal
+description: Propose a new offensive test vector, payload, or excessive agency check.
+labels: ["payload", "enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Propose a new attack payload or fuzzing vector for OWASP Agentic Threat Auditor (OATA).
+  - type: dropdown
+    id: category
+    attributes:
+      label: Threat Category
+      description: Select the target threat classification
+      options:
+        - "AT-01: Excessive Tool Agency (OWASP LLM08)"
+        - "AT-02: Multi-Hop Lateral Escalation"
+        - "AT-03: Tool Parameter Mutation / Schema Bypass"
+        - "AT-04: Context Bleed & Memory Poisoning"
+        - "AT-05: MCP Server Hijacking"
+    validations:
+      required: true
+  - type: input
+    id: vector-name
+    attributes:
+      label: Vector Name
+      placeholder: "e.g., Unsanitized JSON Deserialization in Agent Tool Arguments"
+    validations:
+      required: true
+  - type: textarea
+    id: threat-model
+    attributes:
+      label: Threat Model & Rationale
+      description: Explain the mechanics of this attack and why agent middleware is vulnerable.
+    validations:
+      required: true
+  - type: textarea
+    id: sample-payload
+    attributes:
+      label: Sample Prompt / Mutated Payload
+      description: Minimal reproducible prompt or tool argument mutation.
+      render: markdown
+    validations:
+      required: true
+  - type: textarea
+    id: detection-heuristic
+    attributes:
+      label: Detection Heuristic
+      description: How does OATA evaluate whether the target agent is vulnerable or isolated?
+    validations:
+      required: true
+  - type: input
+    id: references
+    attributes:
+      label: References
+      description: Relevant CWE ID, CVE reference, or academic paper.
+      placeholder: "CWE-284, CVE-2025-XXXX"
+

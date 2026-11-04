@@ -43,6 +43,8 @@ OATA provides DevSecOps teams and red teamers with an automated auditing suite t
 * [ ] **1.5 Repository, Governance & Release**:
   * [x] Configure Apache 2.0 licensing, OWASP Code of Conduct, and `SECURITY.md`.
   * [x] Implement Developer Certificate of Origin (DCO) validation workflow (`.github/workflows/dco.yml`) and CI test runner (`.github/workflows/ci.yml`).
+  * [x] Configure community issue forms (bug reports, vector submissions) and PR template (`.github/`).
+  * [x] Add offline sample trace fixtures (`examples/sample_trace.json`) and CI status badge.
   * [ ] Publish **v0.1-Alpha** release package to PyPI test index and GitHub Releases.
 
 ---

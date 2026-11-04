@@ -28,4 +28,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Developer Certificate of Origin (DCO) commit sign-off validator (`.github/workflows/dco.yml`).
   - Unit test suite in `tests/` with 11 passing tests.
   - Project governance documents: `README.md`, `CONTRIBUTING.md`, `CODE_OF_CONDUCT.md`, `SECURITY.md`, `LICENSE`, `ROADMAP.md`, and `proposal.md`.
+  - GitHub Community Issue Templates (`bug_report.yml`, `new_vector.yml`) and Pull Request Template with DCO checklist.
+  - CI workflow status badge in `README.md`.
+- **Examples & Trace Fixtures**:
+  - Sample agent interaction trace (`examples/sample_trace.json`) for offline trace replay testing.
+  - Enhanced `guard.py` path resolution to support local file paths and Windows drive roots.
 
