@@ -143,16 +143,26 @@ oata demo --format sarif --output oata-report.sarif
 View registered offensive vectors, their severity, and threat taxonomy:
 
 ```bash
+# Core Phase 1 suite
 oata list-payloads
+
+# Full suite including SSRF and credential exfiltration probes
+oata list-payloads --all
 ```
 
-### 3. Audit an Agent Target or Offline Trace
+### 3. Audit a Live Agent Endpoint or Offline Trace
 
-Audit a local endpoint (protected by the Safe Local Target Guard):
+Audit a local HTTP or `/v1/chat/completions` endpoint (protected by the Safe Local Target Guard) or an offline execution trace:
 
 ```bash
-# Audit a local endpoint
-oata audit --target 127.0.0.1:8000 --format console
+# 1. Start the built-in vulnerable live agent server (Terminal 1)
+python examples/live_agent_server.py
+
+# 2. Audit the live /v1/chat/completions endpoint with the full payload suite (Terminal 2)
+oata audit --target http://127.0.0.1:8000/v1/chat/completions --adapter http --profile full --concurrency 5
+
+# Audit a generic REST agent endpoint with custom auth header and Markdown output
+oata audit --target http://127.0.0.1:8000/chat --adapter http -H "Authorization: Bearer token" -f markdown
 
 # Audit an offline interaction trace JSON file
 oata audit --target ./examples/sample_trace.json --adapter trace --format sarif --output trace_audit.sarif

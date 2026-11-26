@@ -12,9 +12,10 @@ from rich.console import Console
 from rich.table import Table
 
 from oata import __version__
+from oata.adapters.http import HttpAgentAdapter
 from oata.adapters.mock import MockAgentAdapter
 from oata.adapters.trace import TraceReplayAdapter
-from oata.core.engine import AuditEngine, get_default_payload_suite
+from oata.core.engine import AuditEngine, get_default_payload_suite, get_extended_payload_suite
 from oata.core.guard import TargetGuardViolationError
 from oata.core.models import TargetConfig
 from oata.reporters.console import render_console_report
@@ -46,11 +47,12 @@ def version_cmd() -> None:
 
 
 @main.command("list-payloads")
-def list_payloads_cmd() -> None:
-    """List all registered Phase 1 offensive attack vector payloads."""
-    payloads = get_default_payload_suite()
+@click.option("--all", "show_all", is_flag=True, default=False, help="Include extended SSRF and credential probes.")
+def list_payloads_cmd(show_all: bool) -> None:
+    """List registered offensive attack vector payloads."""
+    payloads = get_extended_payload_suite() if show_all else get_default_payload_suite()
     table = Table(
-        title="OATA Core Offensive Payload Suite (Phase 1: Foundation)",
+        title="OATA Core Offensive Payload Suite",
         box=ROUNDED,
         header_style="bold magenta",
         show_lines=True,
@@ -108,9 +110,36 @@ def demo_cmd(output_format: str, output_file: Optional[str]) -> None:
 @click.option(
     "--adapter",
     "-a",
-    type=click.Choice(["mock", "trace"], case_sensitive=False),
+    type=click.Choice(["mock", "trace", "http"], case_sensitive=False),
     default="mock",
-    help="Target adapter driver type (mock, trace).",
+    help="Target adapter driver type (mock, trace, http).",
+)
+@click.option(
+    "--profile",
+    "-p",
+    type=click.Choice(["standard", "full"], case_sensitive=False),
+    default="standard",
+    help="Payload suite profile (standard=3 core vectors, full=5 vectors incl. SSRF & credential probes).",
+)
+@click.option(
+    "--model",
+    "-m",
+    default="local-agent",
+    help="Model identifier for chat-completions endpoints (default: local-agent).",
+)
+@click.option(
+    "--header",
+    "-H",
+    "headers",
+    multiple=True,
+    help="Custom HTTP header in 'Key: Value' format (repeatable).",
+)
+@click.option(
+    "--concurrency",
+    "-c",
+    type=int,
+    default=5,
+    help="Maximum concurrent payload requests (default: 5).",
 )
 @click.option(
     "--allow-remote",
@@ -133,21 +162,42 @@ def demo_cmd(output_format: str, output_file: Optional[str]) -> None:
     type=click.Path(dir_okay=False, writable=True),
     help="Write report to destination file path.",
 )
-def audit_cmd(target: str, adapter: str, allow_remote: bool, output_format: str, output_file: Optional[str]) -> None:
+def audit_cmd(
+    target: str,
+    adapter: str,
+    profile: str,
+    model: str,
+    headers: tuple[str, ...],
+    concurrency: int,
+    allow_remote: bool,
+    output_format: str,
+    output_file: Optional[str],
+) -> None:
     """Execute dynamic audit suite against an agent target or execution trace."""
+    parsed_headers = {}
+    for item in headers:
+        if ":" in item:
+            key, value = item.split(":", 1)
+            parsed_headers[key.strip()] = value.strip()
+
+    adapter_key = adapter.lower()
     config = TargetConfig(
         name=f"AuditTarget-{target}",
         endpoint=target,
-        adapter_type=adapter,
+        adapter_type=adapter_key,
         allow_remote=allow_remote,
+        metadata={"model": model, "headers": parsed_headers},
     )
 
-    if adapter == "trace":
+    if adapter_key == "trace":
         driver = TraceReplayAdapter(config)
+    elif adapter_key == "http":
+        driver = HttpAgentAdapter(config)
     else:
         driver = MockAgentAdapter(config)
 
-    engine = AuditEngine(config, driver)
+    payloads = get_extended_payload_suite() if profile.lower() == "full" else get_default_payload_suite()
+    engine = AuditEngine(config, driver, payloads=payloads, concurrency=concurrency)
 
     try:
         report = asyncio.run(engine.run())
