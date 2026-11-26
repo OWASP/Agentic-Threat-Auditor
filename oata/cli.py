@@ -19,6 +19,7 @@ from oata.core.guard import TargetGuardViolationError
 from oata.core.models import TargetConfig
 from oata.reporters.console import render_console_report
 from oata.reporters.json_reporter import export_json_report
+from oata.reporters.markdown import export_markdown_report
 from oata.reporters.sarif import export_sarif_report
 
 console = Console()
@@ -70,7 +71,7 @@ def list_payloads_cmd() -> None:
     "--format",
     "-f",
     "output_format",
-    type=click.Choice(["console", "json", "sarif"], case_sensitive=False),
+    type=click.Choice(["console", "json", "sarif", "markdown"], case_sensitive=False),
     default="console",
     help="Report output format (default: console)",
 )
@@ -121,9 +122,9 @@ def demo_cmd(output_format: str, output_file: Optional[str]) -> None:
     "--format",
     "-f",
     "output_format",
-    type=click.Choice(["console", "json", "sarif"], case_sensitive=False),
+    type=click.Choice(["console", "json", "sarif", "markdown"], case_sensitive=False),
     default="console",
-    help="Report output format (console, json, sarif).",
+    help="Report output format (console, json, sarif, markdown).",
 )
 @click.option(
     "--output",
@@ -174,6 +175,12 @@ def _dispatch_report(report, output_format: str, output_file: Optional[str]) -> 
             print(sarif_output)
         else:
             console.print(f"[green]Report exported in SARIF v2.1.0 format to:[/green] {output_file}")
+    elif fmt == "markdown":
+        md_output = export_markdown_report(report, output_file)
+        if not output_file:
+            print(md_output)
+        else:
+            console.print(f"[green]Report exported in Markdown format to:[/green] {output_file}")
     else:
         render_console_report(report, console)
         if output_file:
