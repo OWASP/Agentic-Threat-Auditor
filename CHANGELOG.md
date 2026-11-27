@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [Unreleased]
+
+### Added
+- **Live HTTP Adapter (`oata/adapters/http.py`)**: Asynchronous `HttpAgentAdapter` (`--adapter http`) with automatic `/v1/chat/completions` and generic REST JSON detection, multi-turn `session_context` history, `tool_calls` normalization, `--model`, repeatable `--header`, and `TargetGuard` enforcement.
+- **Concurrent Async Engine (`oata/core/engine.py`)**: Bounded concurrent payload execution using `asyncio.Semaphore` and `--concurrency` CLI option.
+- **Extended Offensive Payloads**:
+  - `SSRFMetadataPayload` (`OATA-VEC-04A`): Probes HTTP/fetch tools for cloud metadata SSRF (`169.254.169.254`, `CWE-918`).
+  - `CredentialLeakPayload` (`OATA-VEC-05A`): Probes tool calls and raw responses for `.env` / `os.environ` secret exfiltration (`CWE-200`).
+- **Payload Profiles & Live Testbed**: Added `--profile standard|full` on `oata audit`, `--all` on `oata list-payloads`, and `examples/live_agent_server.py` for zero-dependency live HTTP auditing.
+- **Markdown Report Exporter (`oata/reporters/markdown.py`)**: Added `--format markdown` output support by @crypticrhino0 (#3).
+
+---
+
 ## [0.1.0a1] - 2026-11-04
 
 ### Added
